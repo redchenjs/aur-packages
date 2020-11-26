@@ -12,11 +12,11 @@ jobs:
       - name: Get latest package version
         shell: bash {0}
         run: |
+          echo "AUR_PKGNAME=mitalk" >> $GITHUB_ENV
           echo "PKG_FILE_VER=$(curl -s -L http://www.miliao.com/upgrade/client/upgrade/getDownloadInfo | sed -r 's|.*([0-9]+\.[0-9]+\.[0-9]+).*|\1|g')" >> $GITHUB_ENV
       - name: Set environment variables
         shell: bash {0}
         run: |
-          echo "AUR_PKGNAME=mitalk" >> $GITHUB_ENV
           echo "PKG_FILE_URL=https://s1.zb.mi.com/miliao/apk/miliao/8.8/MiTalk_${{ env.PKG_FILE_VER }}.deb" >> $GITHUB_ENV
           echo "PKG_FILE_NAME=MiTalk_${{ env.PKG_FILE_VER }}.deb" >> $GITHUB_ENV
       - name: Setup SSH & Git

@@ -12,11 +12,11 @@ jobs:
       - name: Get latest package version
         shell: bash {0}
         run: |
+          echo "AUR_PKGNAME=utools" >> $GITHUB_ENV
           echo "PKG_FILE_VER=$(curl -s -L https://res.u-tools.cn/currentversion/public-linux.yml | head -n 1 | sed -r 's|version: (.*)$|\1|g')" >> $GITHUB_ENV
       - name: Set environment variables
         shell: bash {0}
         run: |
-          echo "AUR_PKGNAME=utools" >> $GITHUB_ENV
           echo "PKG_FILE_URL=https://resource.u-tools.cn/currentversion/utools_${{ env.PKG_FILE_VER }}_amd64.deb" >> $GITHUB_ENV
           echo "PKG_FILE_NAME=utools_${{ env.PKG_FILE_VER }}_amd64.deb" >> $GITHUB_ENV
       - name: Setup SSH & Git
