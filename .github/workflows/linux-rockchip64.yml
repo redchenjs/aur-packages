@@ -3,7 +3,7 @@ name: linux-rockchip64
 on:
   workflow_dispatch:
   schedule:
-    - cron: 00 01 * * *
+    - cron: 05 09 * * *
 
 jobs:
   build:
@@ -12,11 +12,11 @@ jobs:
       - name: Get latest package version
         shell: bash {0}
         run: |
-          latest=$(curl -s -L https://api.github.com/repos/redchenjs/armbian-ci/tags | grep '".*-rockchip64"' | head -n 1 | sed -r 's|.*"(.*)".*|\1|g')
-          curl -s -L "https://api.github.com/repos/redchenjs/armbian-ci/releases/tags/$latest" -o latest
-          echo "UBUNTU_VERSION=$(cat latest | grep body | sed -r 's|.*".*-(.*)".*$|\1|g')" >> $GITHUB_ENV
-          echo "KERNEL_VERSION=$(cat latest | grep tag_name | sed -r 's|.*"v(.*)-.*".*$|\1|g')" >> $GITHUB_ENV
-          echo "ARMBIAN_VERSION=$(cat latest | grep body | sed -r 's|.*"(.*)-.*".*$|\1|g')" >> $GITHUB_ENV
+          curl -s -L https://beta.armbian.com/dists/focal/main/binary-arm64/Packages -o packages
+          echo "UBUNTU_VERSION=focal" >> $GITHUB_ENV
+          echo "KERNEL_VERSION=$(cat packages | grep 'linux-dtb-current-rockchip64_.*deb' | head -n 1 | sed -r 's|.*l/linux-(.*)-.*/l.*|\1|g')" >> $GITHUB_ENV
+          echo "ARMBIAN_RELEASE=$(cat packages | grep 'linux-dtb-current-rockchip64_.*deb' | head -n 1 | sed -r 's|.*\.(.*)_.*|\1|g')" >> $GITHUB_ENV
+          echo "ARMBIAN_VERSION=$(cat packages | grep 'linux-dtb-current-rockchip64_.*deb' | head -n 1 | sed -r 's|.*_(.*)-.*_.*|\1|g')" >> $GITHUB_ENV
       - name: Setup SSH & Git
         shell: bash {0}
         run: |
@@ -31,7 +31,7 @@ jobs:
       - name: Checkout AUR repository
         shell: bash {0}
         run: |
-          git clone "ssh://aur@aur.archlinux.org/linux-rockchip64.git"
+          git clone ssh://aur@aur.archlinux.org/linux-rockchip64.git
       - name: Compile & Install Pacman
         shell: bash {0}
         run: |
@@ -47,6 +47,7 @@ jobs:
         run: |
           cd linux-rockchip64
           sed -r -i "s|^pkgver=.*|pkgver=${{ env.KERNEL_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^pkgrel=.*|pkgrel=${{ env.ARMBIAN_RELEASE }}|g" PKGBUILD
           sed -r -i "s|^_armbian=.*|_armbian=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository

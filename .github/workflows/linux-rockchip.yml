@@ -3,7 +3,7 @@ name: linux-rockchip
 on:
   workflow_dispatch:
   schedule:
-    - cron: 00 22 * * *
+    - cron: 00 09 * * *
 
 jobs:
   build:
@@ -12,11 +12,11 @@ jobs:
       - name: Get latest package version
         shell: bash {0}
         run: |
-          latest=$(curl -s -L https://api.github.com/repos/redchenjs/armbian-ci/tags | grep '".*-rockchip"' | head -n 1 | sed -r 's|.*"(.*)".*|\1|g')
-          curl -s -L "https://api.github.com/repos/redchenjs/armbian-ci/releases/tags/$latest" -o latest
-          echo "UBUNTU_VERSION=$(cat latest | grep body | sed -r 's|.*".*-(.*)".*$|\1|g')" >> $GITHUB_ENV
-          echo "KERNEL_VERSION=$(cat latest | grep tag_name | sed -r 's|.*"v(.*)-.*".*$|\1|g')" >> $GITHUB_ENV
-          echo "ARMBIAN_VERSION=$(cat latest | grep body | sed -r 's|.*"(.*)-.*".*$|\1|g')" >> $GITHUB_ENV
+          curl -s -L https://beta.armbian.com/dists/focal/main/binary-armhf/Packages -o packages
+          echo "UBUNTU_VERSION=focal" >> $GITHUB_ENV
+          echo "KERNEL_VERSION=$(cat packages | grep 'linux-dtb-current-rockchip_.*deb' | head -n 1 | sed -r 's|.*l/linux-(.*)-.*/l.*|\1|g')" >> $GITHUB_ENV
+          echo "ARMBIAN_RELEASE=$(cat packages | grep 'linux-dtb-current-rockchip_.*deb' | head -n 1 | sed -r 's|.*\.(.*)_.*|\1|g')" >> $GITHUB_ENV
+          echo "ARMBIAN_VERSION=$(cat packages | grep 'linux-dtb-current-rockchip_.*deb' | head -n 1 | sed -r 's|.*_(.*)-.*_.*|\1|g')" >> $GITHUB_ENV
       - name: Setup SSH & Git
         shell: bash {0}
         run: |
@@ -31,9 +31,7 @@ jobs:
       - name: Checkout AUR repository
         shell: bash {0}
         run: |
-          git clone "ssh://aur@aur.archlinux.org/linux-rockchip.git"
-          git clone "ssh://aur@aur.archlinux.org/bsp-tinkerboard.git"
-          git clone "ssh://aur@aur.archlinux.org/uboot-tinkerboard.git"
+          git clone ssh://aur@aur.archlinux.org/linux-rockchip.git
       - name: Compile & Install Pacman
         shell: bash {0}
         run: |
@@ -49,28 +47,14 @@ jobs:
         run: |
           cd linux-rockchip
           sed -r -i "s|^pkgver=.*|pkgver=${{ env.KERNEL_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^pkgrel=.*|pkgrel=${{ env.ARMBIAN_RELEASE }}|g" PKGBUILD
           sed -r -i "s|^_armbian=.*|_armbian=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
-          makepkg --printsrcinfo > .SRCINFO
-          cd - && cd bsp-tinkerboard
-          sed -r -i "s|^pkgver=.*|pkgver=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
-          sed -r -i "s|^_ubuntu=.*|_ubuntu=${{ env.UBUNTU_VERSION }}|g" PKGBUILD
-          sed -r -i "s|^_kernel=.*|_kernel=${{ env.KERNEL_VERSION }}|g" PKGBUILD
-          makepkg --printsrcinfo > .SRCINFO
-          cd - && cd uboot-tinkerboard
-          sed -r -i "s|^pkgver=.*|pkgver=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
-          sed -r -i "s|^_kernel=.*|_kernel=${{ env.KERNEL_VERSION }}|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository
         shell: bash {0}
         run: |
           cd linux-rockchip
           git commit -a -m "update to ${{ env.KERNEL_VERSION }}" || true
-          git push
-          cd - && cd bsp-tinkerboard
-          git commit -a -m "update to ${{ env.ARMBIAN_VERSION }}" || true
-          git push
-          cd - && cd uboot-tinkerboard
-          git commit -a -m "update to ${{ env.ARMBIAN_VERSION }}" || true
           git push
       - name: Delete workflows
         uses: ActionsRML/delete-workflow-runs@main
