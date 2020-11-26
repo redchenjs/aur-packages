@@ -12,7 +12,7 @@ jobs:
       - name: Get latest package version
         shell: bash {0}
         run: |
-          latest=$(curl -s -L https://api.github.com/repos/redchenjs/armbian-ci/tags | grep '[0-9]-rockchip' | head -n 1 | sed -r 's|.*"(.*)".*|\1|g')
+          latest=$(curl -s -L https://api.github.com/repos/redchenjs/armbian-ci/tags | grep '".*-rockchip"' | head -n 1 | sed -r 's|.*"(.*)".*|\1|g')
           curl -s -L "https://api.github.com/repos/redchenjs/armbian-ci/releases/tags/$latest" -o latest
           echo "UBUNTU_VERSION=$(cat latest | grep body | sed -r 's|.*".*-(.*)".*$|\1|g')" >> $GITHUB_ENV
           echo "KERNEL_VERSION=$(cat latest | grep tag_name | sed -r 's|.*"v(.*)-.*".*$|\1|g')" >> $GITHUB_ENV
