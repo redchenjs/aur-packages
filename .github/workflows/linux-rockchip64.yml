@@ -47,8 +47,8 @@ jobs:
         run: |
           cd linux-rockchip64
           sed -r -i "s|^pkgver=.*|pkgver=${{ env.KERNEL_VERSION }}|g" PKGBUILD
-          sed -r -i "s|^pkgrel=.*|pkgrel=${{ env.ARMBIAN_RELEASE }}|g" PKGBUILD
-          sed -r -i "s|^_armbian=.*|_armbian=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^_armbrel=.*|_armbrel=${{ env.ARMBIAN_RELEASE }}|g" PKGBUILD
+          sed -r -i "s|^_armbver=.*|_armbver=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository
         shell: bash {0}
