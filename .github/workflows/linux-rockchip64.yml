@@ -1,0 +1,62 @@
+name: linux-rockchip64
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 00 01 * * *
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Get latest package version
+        shell: bash {0}
+        run: |
+          latest=$(curl -s -L https://api.github.com/repos/redchenjs/armbian-ci/tags | grep '".*-rockchip64"' | head -n 1 | sed -r 's|.*"(.*)".*|\1|g')
+          curl -s -L "https://api.github.com/repos/redchenjs/armbian-ci/releases/tags/$latest" -o latest
+          echo "UBUNTU_VERSION=$(cat latest | grep body | sed -r 's|.*".*-(.*)".*$|\1|g')" >> $GITHUB_ENV
+          echo "KERNEL_VERSION=$(cat latest | grep tag_name | sed -r 's|.*"v(.*)-.*".*$|\1|g')" >> $GITHUB_ENV
+          echo "ARMBIAN_VERSION=$(cat latest | grep body | sed -r 's|.*"(.*)-.*".*$|\1|g')" >> $GITHUB_ENV
+      - name: Setup SSH & Git
+        shell: bash {0}
+        run: |
+          mkdir ~/.ssh
+          ssh-keyscan -t "rsa,dsa,ecdsa,ed25519" aur.archlinux.org > ~/.ssh/known_hosts
+          echo "${{ secrets.AUR_SSH_CONFIG }}" > ~/.ssh/config
+          echo "${{ secrets.AUR_SSH_PRIVATE_KEY }}" > ~/.ssh/aur
+          echo "${{ secrets.AUR_SSH_PUBLIC_KEY }}" > ~/.ssh/aur.pub
+          chmod 600 ~/.ssh/aur
+          git config --global user.name "${{ secrets.AUR_COMMIT_USERNAME }}"
+          git config --global user.email "${{ secrets.AUR_COMMIT_EMAIL }}"
+      - name: Checkout AUR repository
+        shell: bash {0}
+        run: |
+          git clone "ssh://aur@aur.archlinux.org/linux-rockchip64.git"
+      - name: Compile & Install Pacman
+        shell: bash {0}
+        run: |
+          sudo apt install build-essential meson ninja-build libarchive-dev libcurl4-openssl-dev libgpgme-dev libssl-dev nettle-dev
+          git clone https://git.archlinux.org/pacman.git
+          cd pacman
+          mkdir build && cd build
+          meson ../
+          ninja build -C .
+          sudo ninja install
+      - name: Update PKGBUILD
+        shell: bash {0}
+        run: |
+          cd linux-rockchip64
+          sed -r -i "s|^pkgver=.*|pkgver=${{ env.KERNEL_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^_armbian=.*|_armbian=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
+          makepkg --printsrcinfo > .SRCINFO
+      - name: Update AUR repository
+        shell: bash {0}
+        run: |
+          cd linux-rockchip64
+          git commit -a -m "update to ${{ env.KERNEL_VERSION }}" || true
+          git push
+      - name: Delete workflows
+        uses: ActionsRML/delete-workflow-runs@main
+        with:
+          retain_days: 1
+          keep_minimum_runs: 3
