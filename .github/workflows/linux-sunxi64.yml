@@ -3,7 +3,7 @@ name: linux-sunxi64
 on:
   workflow_dispatch:
   schedule:
-    - cron: 00 22 * * *
+    - cron: 00 20 * * *
 
 jobs:
   build:

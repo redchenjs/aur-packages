@@ -3,7 +3,7 @@ name: linux-rockchip
 on:
   workflow_dispatch:
   schedule:
-    - cron: 00 20 * * *
+    - cron: 00 22 * * *
 
 jobs:
   build:
