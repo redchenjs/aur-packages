@@ -57,6 +57,7 @@ jobs:
         if: env.LATEST_VERSION == 0
         shell: bash {0}
         run: |
+          sudo apt update
           sudo apt install build-essential meson ninja-build libarchive-dev libcurl4-openssl-dev libgpgme-dev libssl-dev nettle-dev
           git clone https://git.archlinux.org/pacman.git
           cd pacman
@@ -79,8 +80,3 @@ jobs:
           cd ${{ env.AUR_PKGNAME }}
           git commit -a -m "update to ${{ env.PKG_FILE_VER }}" || true
           git push
-      - name: Delete workflows
-        uses: ActionsRML/delete-workflow-runs@main
-        with:
-          retain_days: 1
-          keep_minimum_runs: 3

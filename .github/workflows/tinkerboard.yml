@@ -13,8 +13,9 @@ jobs:
         shell: bash {0}
         run: |
           curl -s -L https://apt.armbian.com/dists/focal/main/binary-armhf/Packages -o packages
+          echo "FW_VERSION=$(cat packages | grep 'armbian-firmware_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
+          echo "BSP_VERSION=$(cat packages | grep 'linux-u-boot-current-tinkerboard_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
           echo "UBUNTU_VERSION=focal" >> $GITHUB_ENV
-          echo "ARMBIAN_VERSION=$(cat packages | grep 'linux-u-boot-current-tinkerboard_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
       - name: Setup SSH & Git
         shell: bash {0}
         run: |
@@ -34,6 +35,7 @@ jobs:
       - name: Compile & Install Pacman
         shell: bash {0}
         run: |
+          sudo apt update
           sudo apt install build-essential meson ninja-build libarchive-dev libcurl4-openssl-dev libgpgme-dev libssl-dev nettle-dev
           git clone https://git.archlinux.org/pacman.git
           cd pacman
@@ -45,23 +47,19 @@ jobs:
         shell: bash {0}
         run: |
           cd bsp-tinkerboard
-          sed -r -i "s|^pkgver=.*|pkgver=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^pkgver=.*|pkgver=${{ env.BSP_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^_pkgver=.*|_pkgver=${{ env.FW_VERSION }}|g" PKGBUILD
           sed -r -i "s|^_ubuntu=.*|_ubuntu=${{ env.UBUNTU_VERSION }}|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
           cd - && cd uboot-tinkerboard
-          sed -r -i "s|^pkgver=.*|pkgver=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^pkgver=.*|pkgver=${{ env.BSP_VERSION }}|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository
         shell: bash {0}
         run: |
           cd bsp-tinkerboard
-          git commit -a -m "update to ${{ env.ARMBIAN_VERSION }}" || true
+          git commit -a -m "update to ${{ env.BSP_VERSION }}" || true
           git push
           cd - && cd uboot-tinkerboard
-          git commit -a -m "update to ${{ env.ARMBIAN_VERSION }}" || true
+          git commit -a -m "update to ${{ env.BSP_VERSION }}" || true
           git push
-      - name: Delete workflows
-        uses: ActionsRML/delete-workflow-runs@main
-        with:
-          retain_days: 1
-          keep_minimum_runs: 3

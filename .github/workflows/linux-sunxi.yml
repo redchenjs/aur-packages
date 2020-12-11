@@ -35,6 +35,7 @@ jobs:
       - name: Compile & Install Pacman
         shell: bash {0}
         run: |
+          sudo apt update
           sudo apt install build-essential meson ninja-build libarchive-dev libcurl4-openssl-dev libgpgme-dev libssl-dev nettle-dev
           git clone https://git.archlinux.org/pacman.git
           cd pacman
@@ -56,8 +57,3 @@ jobs:
           cd linux-sunxi
           git commit -a -m "update to ${{ env.KERNEL_VERSION }}" || true
           git push
-      - name: Delete workflows
-        uses: ActionsRML/delete-workflow-runs@main
-        with:
-          retain_days: 1
-          keep_minimum_runs: 3
