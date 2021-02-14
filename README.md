@@ -11,3 +11,4 @@ Update AUR repositories using GitHub Actions
 * [linux-rockchip64](https://aur.archlinux.org/pkgbase/linux-rockchip64)
 * [bsp-tinkerboard](https://aur.archlinux.org/pkgbase/bsp-tinkerboard)
 * [uboot-tinkerboard](https://aur.archlinux.org/pkgbase/uboot-tinkerboard)
+* [intel-cpu-runtime](https://aur.archlinux.org/pkgbase/intel-cpu-runtime)
