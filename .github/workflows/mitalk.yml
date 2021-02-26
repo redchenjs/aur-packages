@@ -2,8 +2,8 @@ name: mitalk
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: 25 09 * * *
+#  schedule:
+#    - cron: 25 09 * * *
 
 jobs:
   build:
