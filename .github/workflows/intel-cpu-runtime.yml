@@ -14,10 +14,10 @@ jobs:
         run: |
           echo "AUR_PKGNAME=intel-cpu-runtime" >> $GITHUB_ENV
           curl -s -L https://apt.repos.intel.com/oneapi/dists/all/main/binary-amd64/Packages -o packages
-          echo "TBB_VERSION=$(cat packages | grep 'intel-oneapi-runtime-tbb-.*deb' | head -n 1 | sed -r 's|.*-(.*)-.*_.*$|\1|g')" >> $GITHUB_ENV
-          echo "TBB_RELEASE=$(cat packages | grep 'intel-oneapi-runtime-tbb-.*deb' | head -n 1 | sed -r 's|.*-.*-(.*)_.*$|\1|g')" >> $GITHUB_ENV
-          echo "OPENCL_VERSION=$(cat packages | grep 'intel-oneapi-runtime-opencl-.*deb' | head -n 1 | sed -r 's|.*-(.*)-.*_.*$|\1|g')" >> $GITHUB_ENV
-          echo "OPENCL_RELEASE=$(cat packages | grep 'intel-oneapi-runtime-opencl-.*deb' | head -n 1 | sed -r 's|.*-.*-(.*)_.*$|\1|g')" >> $GITHUB_ENV
+          echo "TBB_VERSION=$(cat packages | grep 'intel-oneapi-runtime-tbb-.*deb' | sort -r | head -n 1 | sed -r 's|.*-(.*)-.*_.*$|\1|g')" >> $GITHUB_ENV
+          echo "TBB_RELEASE=$(cat packages | grep 'intel-oneapi-runtime-tbb-.*deb' | sort -r | head -n 1 | sed -r 's|.*-.*-(.*)_.*$|\1|g')" >> $GITHUB_ENV
+          echo "OPENCL_VERSION=$(cat packages | grep 'intel-oneapi-runtime-opencl-.*deb' | sort -r | head -n 1 | sed -r 's|.*-(.*)-.*_.*$|\1|g')" >> $GITHUB_ENV
+          echo "OPENCL_RELEASE=$(cat packages | grep 'intel-oneapi-runtime-opencl-.*deb' | sort -r | head -n 1 | sed -r 's|.*-.*-(.*)_.*$|\1|g')" >> $GITHUB_ENV
       - name: Setup SSH & Git
         shell: bash {0}
         run: |
