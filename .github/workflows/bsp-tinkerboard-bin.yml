@@ -45,7 +45,7 @@ jobs:
       - name: Update PKGBUILD
         shell: bash {0}
         run: |
-          cd bsp-tinkerboard
+          cd bsp-tinkerboard-bin
           sed -r -i "s|^pkgver=.*|pkgver=${{ env.BSP_VERSION }}|g" PKGBUILD
           sed -r -i "s|^_pkgver=.*|_pkgver=${{ env.FW_VERSION }}|g" PKGBUILD
           sed -r -i "s|^_ubuntu=.*|_ubuntu=${{ env.UBUNTU_VERSION }}|g" PKGBUILD
@@ -53,6 +53,6 @@ jobs:
       - name: Update AUR repository
         shell: bash {0}
         run: |
-          cd bsp-tinkerboard
+          cd bsp-tinkerboard-bin
           git commit -a -m "update to ${{ env.BSP_VERSION }}" || true
           git push

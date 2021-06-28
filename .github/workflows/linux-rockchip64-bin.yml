@@ -46,7 +46,7 @@ jobs:
       - name: Update PKGBUILD
         shell: bash {0}
         run: |
-          cd linux-rockchip64
+          cd linux-rockchip64-bin
           sed -r -i "s|^pkgver=.*|pkgver=${{ env.KERNEL_VERSION }}|g" PKGBUILD
           sed -r -i "s|^_armbrel=.*|_armbrel=${{ env.ARMBIAN_RELEASE }}|g" PKGBUILD
           sed -r -i "s|^_armbver=.*|_armbver=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
@@ -54,6 +54,6 @@ jobs:
       - name: Update AUR repository
         shell: bash {0}
         run: |
-          cd linux-rockchip64
+          cd linux-rockchip64-bin
           git commit -a -m "update to ${{ env.KERNEL_VERSION }}" || true
           git push

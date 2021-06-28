@@ -44,12 +44,12 @@ jobs:
       - name: Update PKGBUILD
         shell: bash {0}
         run: |
-          cd uboot-tinkerboard
+          cd uboot-tinkerboard-bin
           sed -r -i "s|^pkgver=.*|pkgver=${{ env.UBOOT_VERSION }}|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository
         shell: bash {0}
         run: |
-          cd uboot-tinkerboard
+          cd uboot-tinkerboard-bin
           git commit -a -m "update to ${{ env.UBOOT_VERSION }}" || true
           git push
