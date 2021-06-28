@@ -1,9 +1,9 @@
-name: linux-rockchip
+name: bsp-tinkerboard-bin
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: 00 09 * * *
+    - cron: 30 09 * * *
 
 jobs:
   build:
@@ -12,11 +12,10 @@ jobs:
       - name: Get latest package version
         shell: bash {0}
         run: |
-          curl -s -L https://beta.armbian.com/dists/focal/main/binary-armhf/Packages -o packages
+          curl -s -L https://apt.armbian.com/dists/focal/main/binary-armhf/Packages -o packages
+          echo "FW_VERSION=$(cat packages | grep 'armbian-firmware_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
+          echo "BSP_VERSION=$(cat packages | grep 'linux-focal-root-current-tinkerboard_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
           echo "UBUNTU_VERSION=focal" >> $GITHUB_ENV
-          echo "KERNEL_VERSION=$(cat packages | grep 'linux-dtb-current-rockchip_.*deb' | head -n 1 | sed -r 's|.*l/linux-(.*)-.*/l.*|\1|g')" >> $GITHUB_ENV
-          echo "ARMBIAN_RELEASE=$(cat packages | grep 'linux-dtb-current-rockchip_.*deb' | head -n 1 | sed -r 's|.*\.(.*)_.*|\1|g')" >> $GITHUB_ENV
-          echo "ARMBIAN_VERSION=$(cat packages | grep 'linux-dtb-current-rockchip_.*deb' | head -n 1 | sed -r 's|.*_(.*)-.*_.*|\1|g')" >> $GITHUB_ENV
       - name: Setup SSH & Git
         shell: bash {0}
         run: |
@@ -31,7 +30,7 @@ jobs:
       - name: Checkout AUR repository
         shell: bash {0}
         run: |
-          git clone ssh://aur@aur.archlinux.org/linux-rockchip.git
+          git clone "ssh://aur@aur.archlinux.org/bsp-tinkerboard-bin.git"
       - name: Compile & Install Pacman
         shell: bash {0}
         run: |
@@ -46,14 +45,14 @@ jobs:
       - name: Update PKGBUILD
         shell: bash {0}
         run: |
-          cd linux-rockchip
-          sed -r -i "s|^pkgver=.*|pkgver=${{ env.KERNEL_VERSION }}|g" PKGBUILD
-          sed -r -i "s|^_armbrel=.*|_armbrel=${{ env.ARMBIAN_RELEASE }}|g" PKGBUILD
-          sed -r -i "s|^_armbver=.*|_armbver=${{ env.ARMBIAN_VERSION }}|g" PKGBUILD
+          cd bsp-tinkerboard
+          sed -r -i "s|^pkgver=.*|pkgver=${{ env.BSP_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^_pkgver=.*|_pkgver=${{ env.FW_VERSION }}|g" PKGBUILD
+          sed -r -i "s|^_ubuntu=.*|_ubuntu=${{ env.UBUNTU_VERSION }}|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository
         shell: bash {0}
         run: |
-          cd linux-rockchip
-          git commit -a -m "update to ${{ env.KERNEL_VERSION }}" || true
+          cd bsp-tinkerboard
+          git commit -a -m "update to ${{ env.BSP_VERSION }}" || true
           git push
