@@ -36,7 +36,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install build-essential meson ninja-build libarchive-dev libcurl4-openssl-dev libgpgme-dev libssl-dev nettle-dev
-          git clone https://git.archlinux.org/pacman.git
+          git clone https://gitlab.archlinux.org/pacman/pacman.git
           cd pacman
           mkdir build && cd build
           meson ../
