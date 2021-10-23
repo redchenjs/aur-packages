@@ -13,7 +13,7 @@ jobs:
         shell: bash {0}
         run: |
           echo "AUR_PKGNAME=utools" >> $GITHUB_ENV
-          echo "PKG_FILE_VER=$(curl -s -L https://u.tools | sed -r 's|version: (.*)$|\1|g' | head -n 1)" >> $GITHUB_ENV
+          echo "PKG_FILE_VER=$(curl -s -L https://u.tools | sed -r "s|version: '(.*)'|\1|g" | head -n 1)" >> $GITHUB_ENV
       - name: Set environment variables
         shell: bash {0}
         run: |
