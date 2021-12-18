@@ -54,7 +54,7 @@ jobs:
           wget ${{ env.PKG_FILE_URL }}
           echo "PKG_SHA512SUM=$(sha512sum ${{ env.PKG_FILE_NAME }} | sed -r 's|([0-9a-z]+).*|\1|g')" >> $GITHUB_ENV
       - name: Compile & Install Pacman
-        if: env.LATEST_VERSION == 0
+#        if: env.LATEST_VERSION == 0
         shell: bash {0}
         run: |
           sudo apt update
