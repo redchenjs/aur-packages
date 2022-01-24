@@ -14,7 +14,6 @@ jobs:
         run: |
           curl -s -L https://apt.armbian.com/dists/focal/main/binary-armhf/Packages -o packages
           echo "FW_VERSION=$(cat packages | grep 'armbian-firmware_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
-          curl -s -L https://apt.armbian.com/dists/focal/focal-utils/binary-armhf/Packages -o packages
           echo "BSP_VERSION=$(cat packages | grep 'armbian-bsp-cli-tinkerboard_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
           echo "UBUNTU_VERSION=focal" >> $GITHUB_ENV
       - name: Setup SSH & Git
