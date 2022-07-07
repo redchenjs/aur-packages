@@ -12,8 +12,7 @@ jobs:
       - name: Get latest package version
         shell: bash {0}
         run: |
-          curl -s -L https://imola.armbian.com/beta/dists/jammy/main/binary-armhf/Packages -o packages
-          echo "UBUNTU_VERSION=jammy" >> $GITHUB_ENV
+          curl -s -L https://apt.armbian.com/dists/jammy/main/binary-armhf/Packages -o packages
           echo "KERNEL_VERSION=$(cat packages | grep 'linux-dtb-legacy-rockchip_.*.deb' | head -n 1 | sed -r 's|.*l/linux-(.*)-.*/l.*|\1|g')" >> $GITHUB_ENV
           echo "ARMBIAN_VERSION=$(cat packages | grep 'linux-dtb-legacy-rockchip_.*.deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
       - name: Setup SSH & Git

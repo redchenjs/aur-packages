@@ -12,10 +12,9 @@ jobs:
       - name: Get latest package version
         shell: bash {0}
         run: |
-          curl -s -L https://apt.armbian.com/dists/focal/main/binary-armhf/Packages -o packages
+          curl -s -L https://apt.armbian.com/dists/jammy/main/binary-armhf/Packages -o packages
           echo "FW_VERSION=$(cat packages | grep 'armbian-firmware_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
           echo "BSP_VERSION=$(cat packages | grep 'armbian-bsp-cli-tinkerboard_.*deb' | head -n 1 | sed -r 's|.*_(.*)_.*|\1|g')" >> $GITHUB_ENV
-          echo "UBUNTU_VERSION=focal" >> $GITHUB_ENV
       - name: Setup SSH & Git
         shell: bash {0}
         run: |
@@ -48,7 +47,6 @@ jobs:
           cd bsp-tinkerboard-bin
           sed -r -i "s|^pkgver=.*|pkgver=${{ env.BSP_VERSION }}|g" PKGBUILD
           sed -r -i "s|^_pkgver=.*|_pkgver=${{ env.FW_VERSION }}|g" PKGBUILD
-          sed -r -i "s|^_ubuntu=.*|_ubuntu=${{ env.UBUNTU_VERSION }}|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository
         shell: bash {0}
