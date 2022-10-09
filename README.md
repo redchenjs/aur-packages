@@ -12,3 +12,4 @@ Update AUR repositories using GitHub Actions
 * [bsp-tinkerboard-bin](https://aur.archlinux.org/pkgbase/bsp-tinkerboard-bin)
 * [uboot-tinkerboard-bin](https://aur.archlinux.org/pkgbase/uboot-tinkerboard-bin)
 * [intel-cpu-runtime](https://aur.archlinux.org/pkgbase/intel-cpu-runtime)
+* [ttf-i.ming](https://aur.archlinux.org/pkgbase/ttf-i.ming)
