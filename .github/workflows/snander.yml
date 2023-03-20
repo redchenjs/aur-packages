@@ -14,8 +14,11 @@ jobs:
         run: |
           curl -s -L https://api.github.com/repos/McMCCRU/SNANDer/tags -o tags
           echo "GIT_TAG=$(cat tags | jq ".[] | .name" | head -n 1 | sed -r 's|.*"(.*)".*|\1|g')" >> $GITHUB_ENV
-          echo "GIT_SHA=$(cat tags | jq ".[] | .commit | .sha" | head -n 1 | sed -r 's|.*"(.*)".*|\1|g')" >> $GITHUB_ENV
-          echo "GIT_VER=$(cat tags | jq ".[] | .commit | .sha" | head -n 1 | sed -r 's|.*"(.*)".*|\1|g' | awk '{print substr($1, 0, 7)}')" >> $GITHUB_ENV
+      - name: Get package sha512sums
+        shell: bash {0}
+        run: |
+          wget "https://codeload.github.com/McMCCRU/SNANDer/tar.gz/refs/tags/${{ env.GIT_TAG }}" -O pkg.tar.gz
+          echo "GIT_SHA=$(sha512sum pkg.tar.gz)" >> $GITHUB_ENV
       - name: Setup SSH & Git
         shell: bash {0}
         run: |
@@ -46,12 +49,12 @@ jobs:
         shell: bash {0}
         run: |
           cd snander
-          sed -r -i "s|^_version=.*|_version=${{ env.GIT_TAG }}|g" PKGBUILD
-          sed -r -i "s|^_gitcommit=.*|_gitcommit=${{ env.GIT_SHA }}|g" PKGBUILD
+          sed -r -i "s|^pkgver=.*|pkgver=${{ env.GIT_TAG }}|g" PKGBUILD
+          sed -r -i "s|^sha512sum=.*|sha512sum=('${{ env.GIT_SHA }}')|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository
         shell: bash {0}
         run: |
           cd snander
-          git commit -a -m "Updated to version ${{ env.GIT_TAG }}+1+${{ env.GIT_VER }}" || true
+          git commit -a -m "Updated to version ${{ env.GIT_TAG }}" || true
           git push
