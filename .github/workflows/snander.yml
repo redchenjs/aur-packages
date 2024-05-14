@@ -50,7 +50,7 @@ jobs:
         run: |
           cd snander
           sed -r -i "s|^pkgver=.*|pkgver=${{ env.GIT_TAG }}|g" PKGBUILD
-          sed -r -i "s|^sha512sum=.*|sha512sum=('${{ env.GIT_SHA }}')|g" PKGBUILD
+          sed -r -i "s|^sha512sums=.*|sha512sums=('${{ env.GIT_SHA }}')|g" PKGBUILD
           makepkg --printsrcinfo > .SRCINFO
       - name: Update AUR repository
         shell: bash {0}
