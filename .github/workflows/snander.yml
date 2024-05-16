@@ -18,7 +18,7 @@ jobs:
         shell: bash {0}
         run: |
           wget "https://codeload.github.com/McMCCRU/SNANDer/tar.gz/refs/tags/${{ env.GIT_TAG }}" -O pkg.tar.gz
-          echo "GIT_SHA=$(sha512sum pkg.tar.gz)" >> $GITHUB_ENV
+          echo "GIT_SHA=$(sha512sum pkg.tar.gz | sed -r 's|^([a-z0-9]+).*|\1|')" >> $GITHUB_ENV
       - name: Setup SSH & Git
         shell: bash {0}
         run: |
